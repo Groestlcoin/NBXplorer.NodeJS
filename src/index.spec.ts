@@ -1,5 +1,5 @@
 import * as assert from 'assert';
-import * as bitcoinjs from 'bitcoinjs-lib';
+import * as bitcoinjs from 'groestlcoinjs-lib';
 import * as crypto from 'crypto';
 import * as fs from 'fs';
 import * as path from 'path';
@@ -28,7 +28,7 @@ const resetNBX = async ({ noauth }: { noauth: boolean }): Promise<void> => {
 const hasAuth = async (): Promise<boolean> => {
   const cli = new NBXClient({
     uri: APIURL,
-    cryptoCode: 'btc',
+    cryptoCode: 'grs',
   });
   return cli.getStatus().then(
     () => false,
@@ -73,7 +73,7 @@ const sendToPayment = async (payment: bitcoinjs.Payment): Promise<void> => {
 const testInstance = () => {
   const ok1 = new NBXClient({
     uri: 'http://localhost',
-    cryptoCode: 'btc',
+    cryptoCode: 'grs',
   });
   expect(ok1).toBeDefined();
   expect(() => {
@@ -86,12 +86,12 @@ const testInstance = () => {
   }).toThrowError(new RegExp('Must contain uri .* and cryptoCode .*'));
   expect(() => {
     // @ts-ignore
-    new NBXClient({ cryptoCode: 'btc' });
+    new NBXClient({ cryptoCode: 'grs' });
   }).toThrowError(new RegExp('Must contain uri .* and cryptoCode .*'));
   expect(() => {
     new NBXClient({
       uri: 'http://localhost',
-      cryptoCode: 'btc',
+      cryptoCode: 'grs',
       address: 'xxx',
       derivationScheme: 'yyy',
     });
@@ -107,7 +107,7 @@ const testTrack = async () => {
   const derivationScheme = xpub + '-[legacy]';
   const cli = new NBXClient({
     uri: APIURL,
-    cryptoCode: 'btc',
+    cryptoCode: 'grs',
     derivationScheme,
     cookieFilePath: COOKIE_FILE,
   });
@@ -115,8 +115,8 @@ const testTrack = async () => {
   const result = await cli.getAddress();
   const resultCustom = await cli.getAddress({ feature: 'Custom' });
   const result2 = await cli.getExtPubKeyFromScript(result.scriptPubKey);
-  const expected = getPathPayment(root, 'm/0/0').address;
-  const expectedCustom = getPathPayment(root, 'm/1/2/3/0/5').address;
+  const expected = getPathPayment(root, 'm/17/0').address;
+  const expectedCustom = getPathPayment(root, 'm/1/2/3/0/5/17').address;
   assert.strictEqual(result.address, expected);
   assert.strictEqual(result2.address, expected);
   assert.strictEqual(resultCustom.address, expectedCustom);
@@ -129,12 +129,12 @@ const testGetTransactions = async () => {
   const derivationScheme = xpub + '-[legacy]';
   const cliHD = new NBXClient({
     uri: APIURL + '/', // testing if it deletes trailing slash
-    cryptoCode: 'btc',
+    cryptoCode: 'grs',
     derivationScheme,
     cookieFilePath: COOKIE_FILE,
   });
   await assert.doesNotReject(cliHD.track());
-  const payment = getPathPayment(root, 'm/0/0');
+  const payment = getPathPayment(root, 'm/17/0');
   await sendToPayment(payment);
 
   let txes1: GetTransactionsResponse;
@@ -168,11 +168,11 @@ const testGetTransactions = async () => {
 const testGetTransactionsAddress = async () => {
   await setAuth(true);
   const root = randomHDKey();
-  const payment = getPathPayment(root, 'm/0/0');
+  const payment = getPathPayment(root, 'm/17/0');
   const address = payment.address!;
   const cliaddr = new NBXClient({
     uri: APIURL,
-    cryptoCode: 'btc',
+    cryptoCode: 'grs',
     address,
     cookieFilePath: COOKIE_FILE,
   });
@@ -210,7 +210,7 @@ const testGetTransactionsAddress = async () => {
 const testNoWalletError = async () => {
   const cli = new NBXClient({
     uri: 'http://localhost',
-    cryptoCode: 'btc',
+    cryptoCode: 'grs',
   });
   await expect(cli.track()).rejects.toThrow(
     /^This method needs an address or derivationScheme$/,
@@ -251,7 +251,7 @@ const testMeta = async () => {
   const derivationScheme = xpub + '-[legacy]';
   const cli = new NBXClient({
     uri: APIURL,
-    cryptoCode: 'btc',
+    cryptoCode: 'grs',
     derivationScheme,
     cookieFilePath: COOKIE_FILE,
   });
@@ -293,7 +293,7 @@ const testBroadcast = async () => {
     .extractTransaction();
   const cli = new NBXClient({
     uri: APIURL,
-    cryptoCode: 'btc',
+    cryptoCode: 'grs',
     cookieFilePath: COOKIE_FILE,
   });
   await expect(cli.broadcastTx(tx.toBuffer())).resolves.toBeTruthy();
@@ -308,7 +308,7 @@ const testScanWallet = async () => {
   const derivationScheme = xpub + '-[legacy]';
   const cliHD = new NBXClient({
     uri: APIURL,
-    cryptoCode: 'btc',
+    cryptoCode: 'grs',
     derivationScheme,
     cookieFilePath: COOKIE_FILE,
   });
@@ -330,7 +330,7 @@ const testGetEvents = async () => {
   await setAuth(true);
   const cli = new NBXClient({
     uri: APIURL,
-    cryptoCode: 'btc',
+    cryptoCode: 'grs',
     cookieFilePath: COOKIE_FILE,
   });
   const events = await cli.getEvents();
@@ -344,12 +344,12 @@ const testPsbt = async () => {
   const derivationScheme = xpub + '-[legacy]';
   const cliHD = new NBXClient({
     uri: APIURL,
-    cryptoCode: 'btc',
+    cryptoCode: 'grs',
     derivationScheme,
     cookieFilePath: COOKIE_FILE,
   });
   await cliHD.track();
-  const payment = getPathPayment(root, 'm/0/0');
+  const payment = getPathPayment(root, 'm/17/0');
   const address = payment.address!;
   await regtestUtils.faucet(address, 5e6);
   await regtestUtils.mine(6);
@@ -360,7 +360,7 @@ const testPsbt = async () => {
     },
   });
   const psbt = bitcoinjs.Psbt.fromBase64(result.psbt);
-  psbt.signAllInputs(root.derivePath('m/0/0') as any);
+  psbt.signAllInputs(root.derivePath('m/17/0') as any);
   await cliHD.updatePsbt({ psbt: psbt.toBase64() });
 };
 
@@ -368,7 +368,7 @@ const testGetFeeRate = async () => {
   await setAuth(true);
   const cli = new NBXClient({
     uri: APIURL,
-    cryptoCode: 'btc',
+    cryptoCode: 'grs',
     cookieFilePath: COOKIE_FILE,
   });
   // TODO: perhaps if we do this test near the end it will work
@@ -397,7 +397,7 @@ const testAuth = async () => {
   assert.ok(await hasAuth());
   const cli = new NBXClient({
     uri: APIURL,
-    cryptoCode: 'btc',
+    cryptoCode: 'grs',
     cookieFilePath: COOKIE_FILE,
   });
   await assert.doesNotReject(cli.getStatus());
@@ -405,7 +405,7 @@ const testAuth = async () => {
   assert.ok(!(await hasAuth()));
   const cli2 = new NBXClient({
     uri: APIURL,
-    cryptoCode: 'btc',
+    cryptoCode: 'grs',
   });
   await assert.doesNotReject(cli2.getStatus());
 };
@@ -430,5 +430,5 @@ describe('NBXClient', () => {
   it('should broadcast transactions', testBroadcast);
   it('should get events for the coin', testGetEvents);
   it('should create and update Psbt', testPsbt);
-  it('should get the feeRate from bitcoind', testGetFeeRate);
+  it('should get the feeRate from groestlcoind', testGetFeeRate);
 });

@@ -15,7 +15,7 @@ npm install nbxplorer-client
 ```js
 const cli = new NBXClient({
   uri: 'https://nbx.example.com',
-  cryptoCode: 'btc',
+  cryptoCode: 'grs',
   cookieFilePath: '/home/user/.nbxplorer/Main/.cookie', // Only if noauth is not active
 });
 const txData = await cli.getTransactionNoWallet(txid);
@@ -34,8 +34,8 @@ const updatedPsbt = await cli.updatePsbt({ psbt: 'base64 string' })
 ```js
 const cli = new NBXClient({
   uri: 'https://nbx.example.com',
-  cryptoCode: 'btc',
-  address: '14bnuyjuP5US5JKXc1YuVK8XDe7E3Dnanc',
+  cryptoCode: 'grs',
+  address: 'Fo5Xvgc58JMsMXsfwEY8TvjxX2x4Tdm5jf',
   cookieFilePath: '/home/user/.nbxplorer/Main/.cookie',
 });
 await cli.track(); // MUST DO ONCE PER LIFETIME OF THE WALLET
@@ -48,8 +48,8 @@ await cli.track(); // MUST DO ONCE PER LIFETIME OF THE WALLET
 ```js
 const cli = new NBXClient({
   uri: 'https://nbx.example.com',
-  cryptoCode: 'btc',
-  derivationScheme: 'xpub6DJ5JT2drRS1kTaPGfRrCXdFnG1BCGkzjvStYQYMHFBAumFsMAmxb3ZQBXA1W43zix17okdUoTKSeLkK8vPVUz5cMzFmFBacPJ7EmtX8JUw-[legacy]',
+  cryptoCode: 'grs',
+  derivationScheme: 'xpub661MyMwAqRbcEkSxvXEo7YjYynZAQ2MTEGgdKpUUXukRf33ymeCJasAS3g3QJoMmtCRPrJ1cvexQr7SF8W97dyjfR4miTksU9UtntYopk1B-[legacy]',
   cookieFilePath: '/home/user/.nbxplorer/Main/.cookie',
 });
 await cli.track(); // MUST DO ONCE PER LIFETIME OF THE WALLET

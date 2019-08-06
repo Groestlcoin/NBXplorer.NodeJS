@@ -1,5 +1,5 @@
-FROM junderw/bitcoinjs-regtest-server
-MAINTAINER Jonathan Underwood
+FROM groestlcoin/groestlcoinjs-regtest-server
+MAINTAINER Groestlcoin Developers
 
 WORKDIR /root
 
@@ -27,13 +27,13 @@ RUN git clone https://github.com/dgarage/NBXplorer.git && \
   DOTNET_CLI_TELEMETRY_OPTOUT=1 dotnet restore && \
   DOTNET_CLI_TELEMETRY_OPTOUT=1 dotnet publish --output /app/ --configuration Release
 
-COPY start_bitcoin_and_nbx.sh start_nbx.sh ./
-RUN chmod +x start_bitcoin_and_nbx.sh && \
+COPY start_groestlcoin_and_nbx.sh start_nbx.sh ./
+RUN chmod +x start_groestlcoin_and_nbx.sh && \
   chmod +x start_nbx.sh
 
 COPY stopAndCookie.js ./stopAndCookie/
 
-ENTRYPOINT ["/root/start_bitcoin_and_nbx.sh"]
+ENTRYPOINT ["/root/start_groestlcoin_and_nbx.sh"]
 
 EXPOSE 18271
 EXPOSE 23828

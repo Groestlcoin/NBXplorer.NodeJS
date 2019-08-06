@@ -36,7 +36,7 @@ export class NBXClient {
   constructor(opts: NBXClientOpts) {
     if (!opts.uri || !opts.cryptoCode) {
       throw new Error(
-        'Must contain uri (ex. https://nbx.mydomain.com ) and cryptoCode (ex. btc )',
+        'Must contain uri (ex. https://nbx.mydomain.com ) and cryptoCode (ex. grs )',
       );
     }
     if (!opts.address === false && !opts.address === !opts.derivationScheme) {
