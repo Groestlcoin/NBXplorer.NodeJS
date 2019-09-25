@@ -11,6 +11,17 @@ export interface BasicAuth {
   pass: string;
 }
 
+export interface TrackDerivationSchemeArg {
+  derivationOptions?: DerivationOptions[];
+  wait?: boolean;
+}
+
+export interface DerivationOptions {
+  feature?: 'Deposit' | 'Change' | 'Direct' | 'Custom';
+  minAddresses?: number | null;
+  maxAddresses?: number | null;
+}
+
 export interface GetTransactionsResponse {
   height: number;
   confirmedTransactions: {
@@ -24,14 +35,14 @@ export interface GetTransactionsResponse {
   };
 }
 
-interface Output {
+export interface Output {
   keyPath: string;
   scriptPubKey: string;
   index: number;
   value: number;
 }
 
-interface TransactionBase {
+export interface TransactionBase {
   confirmations: number;
   transactionId: string;
   outputs: Output[];
@@ -40,13 +51,13 @@ interface TransactionBase {
   balanceChange: number;
 }
 
-interface ConfirmedTransaction extends TransactionBase {
+export interface ConfirmedTransaction extends TransactionBase {
   blockHash: string;
   height: number;
   transaction: string;
 }
 
-interface UnconfirmedTransaction extends TransactionBase {
+export interface UnconfirmedTransaction extends TransactionBase {
   blockHash: null;
   height: null;
   transaction: null;
@@ -60,21 +71,21 @@ export interface GetTransactionNoWalletResponse {
   confirmations: number | null;
   blockId: string | null;
   transactionHash: string;
-  transaction: string;
+  transaction: string | null;
   height: number | null;
   timestamp: number;
 }
 
-interface RescanArg1 {
+export interface RescanArg1 {
   blockId: string;
   transactionId: string;
 }
 
-interface RescanArg2 {
+export interface RescanArg2 {
   transactionId: string;
 }
 
-interface RescanArg3 {
+export interface RescanArg3 {
   blockId: string;
   transaction: string;
 }
@@ -138,13 +149,13 @@ export interface GetUtxosResponse {
   hasChanges: boolean;
 }
 
-interface UtxoData {
+export interface UtxoData {
   utxOs: Utxo[];
   spentOutpoints: string[];
   hasChanges: boolean;
 }
 
-interface Utxo {
+export interface Utxo {
   feature: string;
   outpoint: string;
   index: number;
@@ -177,7 +188,7 @@ export interface ScanWalletArgs {
 export interface GetScanStatusResponse {
   error: string | null;
   queuedAt: number;
-  status: string;
+  status: 'Queued' | 'Pending' | 'Complete' | 'Error';
   progress: {
     startedAt: number;
     completedAt: number | null;
@@ -208,19 +219,19 @@ export interface GetEventsArgs {
 
 export type Event = TransactionEvent | BlockEvent;
 
-interface TransactionEvent {
+export interface TransactionEvent {
   eventId: number;
   type: string;
   data: TransactionEventData;
 }
 
-interface BlockEvent {
+export interface BlockEvent {
   eventId: number;
   type: string;
   data: BlockEventData;
 }
 
-interface TransactionEventData {
+export interface TransactionEventData {
   blockId: string | null;
   trackedSource: string;
   derivationStrategy: string;
@@ -236,34 +247,34 @@ interface TransactionEventData {
   cryptoCode: string;
 }
 
-interface BlockEventData {
+export interface BlockEventData {
   height: number;
   hash: string;
   previousBlockHash: string;
   cryptoCode: string;
 }
 
-type Destination = SweepAllDestination | AmountDestination;
+export type Destination = SweepAllDestination | AmountDestination;
 
-interface SweepAllDestination {
+export interface SweepAllDestination {
   destination: string;
   sweepAll: true;
 }
 
-interface AmountDestination {
+export interface AmountDestination {
   destination: string;
   amount: number;
   substractFees?: boolean;
 }
 
-interface FeePreference {
+export interface FeePreference {
   explicitFeeRate?: number;
   explicitFee?: number;
   blockTarget?: number;
   fallbackFeeRate?: number;
 }
 
-interface RebaseKeyPath {
+export interface RebaseKeyPath {
   masterFingerprint: string;
   accountKey: string;
   accountKeyPath: string;

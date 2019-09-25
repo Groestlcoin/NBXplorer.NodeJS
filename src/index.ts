@@ -22,6 +22,7 @@ import {
   PruneResponse,
   RescanTxArgs,
   ScanWalletArgs,
+  TrackDerivationSchemeArg,
   UpdatePsbtArgs,
   UpdatePsbtResponse,
 } from './interfaces';
@@ -68,13 +69,25 @@ export class NBXClient {
     return !!this.address || !!this.derivationScheme;
   }
 
-  async track(): Promise<void> {
-    this.checkWallet();
+  async track(
+    trackDerivationSchemeArg?: TrackDerivationSchemeArg,
+  ): Promise<void> {
+    if (trackDerivationSchemeArg === undefined) {
+      this.checkWallet();
+    } else {
+      try {
+        this.checkHDWallet();
+      } catch (err) {
+        throw new Error(
+          'This method needs a derivationScheme when passing trackDerivationSchemeArg',
+        );
+      }
+    }
     const url = this.address
       ? this.uri + `/v1/cryptos/${this.cryptoCode}/addresses/${this.address}`
       : this.uri +
         `/v1/cryptos/${this.cryptoCode}/derivations/${this.derivationScheme}`;
-    return makePost(url, false, this.auth);
+    return makePost(url, false, this.auth, trackDerivationSchemeArg);
   }
 
   async getTransactions(
@@ -152,7 +165,17 @@ export class NBXClient {
 
   async broadcastTx(tx: Buffer): Promise<BroadcastTxResponse> {
     const url = this.uri + `/v1/cryptos/${this.cryptoCode}/transactions`;
-    return makePost(url, false, this.auth, tx).then(JSON.parse);
+    return makePost(url, false, this.auth, tx)
+      .then(JSON.parse)
+      .then((res: BroadcastTxResponse) => {
+        if (res.success === true) {
+          return res;
+        }
+        throw Object.assign(
+          new Error(res.rpcCodeMessage ? res.rpcCodeMessage : ''),
+          res,
+        );
+      });
   }
 
   async rescanTx(transactions: RescanTxArgs[]): Promise<void> {
@@ -281,3 +304,5 @@ function makePost(
   };
   return (rp(opts) as unknown) as Promise<any>;
 }
+
+export * from './interfaces';
